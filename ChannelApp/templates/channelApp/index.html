@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+</head>
+<body>
+    <h1>Chat APP</h1>
+    <div id='messages'></div>
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button id="sendButton">Send</button>
+    <script>
+        var ws = new WebSocket('ws://127.0.0.1:8001/ws/ac/');
+    
+        // When the connection is successfully opened
+        {% comment %} ws.onopen = function(event) {
+            console.log("WebSocket is open now.");
+            ws.send("Hii I m new member")
+        };
+    
+        // When a message is received from the server
+        ws.onmessage = function(event) {
+            console.log("WebSocket message received:", event);
+        };
+    
+        // When the WebSocket connection is closed
+        ws.onclose = function(event) {
+            console.log("WebSocket is closed now.");
+        };
+    
+        // When there is an error with the WebSocket
+        ws.onerror = function(error) {
+            console.error("WebSocket error:", error);
+        }; {% endcomment %}
+        ws.addEventListener('open',(event)=>{
+            console.log("WebSocket is open now.",event);
+           
+        })
+        ws.addEventListener('message', (event) => {
+            console.log("WebSocket message received:", event);   
+        
+            // Parse the incoming message data as JSON
+            var message = JSON.parse(event.data);
+            
+            // Access the data inside the parsed object
+            console.log(message['message']);
+        
+            // Display the message in the 'messages' div
+            var messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += `<p>${message['message']}</p>`;  // Use `+=` to append new messages
+        });
+
+        ws.addEventListener('error',(error)=>{
+            console.error("WebSocket error:", error);
+        })
+
+        ws.addEventListener('close',(event)=>{
+            console.log("WebSocket Closed now",event);
+        });
+        document.getElementById('sendButton').addEventListener('click', () => {
+            var messageInput = document.getElementById('messageInput');
+            var message = messageInput.value;
+            ws.send(message);  // Send the message to the server
+            messageInput.value = '';  // Clear the input field
+        });
+    </script>
+</body>
+</html>
